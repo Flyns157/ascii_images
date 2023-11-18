@@ -41,4 +41,4 @@ Here is an example of an input image and its ASCII art output:
 ![Output image](/Capture.png)
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](^3^) file for details.
+This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
