@@ -6,7 +6,7 @@ VERSION = 2.0
 NAME = __file__
 
 # ============================================== Functions ==============================================
-def image_to_ascii_art(input_file : str, outpout_file : str = 'out.txt', resize : bool = None, resize_percentage : float = 50, xsize : int = 50, ysize : int = 50, gscale : int = 0, nb_space : int = 1)-> bool :
+def image_to_ascii_art(input_file : str, outpout_file : str = 'out.txt', resize : bool = False, resize_percentage : float = 0.5, xsize : int = 50, ysize : int = 50, gscale : int = 0, nb_space : int = 1)-> bool :
     """
     Converts an image to ASCII art and writes it to a file.
 
@@ -35,7 +35,7 @@ def image_to_ascii_art(input_file : str, outpout_file : str = 'out.txt', resize 
             if resize == None :
                 image = image.resize((xsize, ysize))
             elif resize :
-                image = image.resize((image.width//resize_percentage, image.height//resize_percentage))
+                image = image.resize((int(resize_percentage*image.width), int(resize_percentage*image.height)))
             # Create the ascii image
             file.write(''.join(''.join((ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space for x in range(image.width))) + '\n' for y in range(image.height)))
     except Exception as e:
@@ -47,4 +47,4 @@ def image_to_ascii_art(input_file : str, outpout_file : str = 'out.txt', resize 
             pass
 
 # ================================================= Run =================================================
-image_to_ascii_art("images/2.jpg", resize = False, nb_space = 1)
+image_to_ascii_art("images/1.jpg", resize = True, resize_percentage = 0.1, nb_space = 1, gscale = 0)
