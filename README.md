@@ -1,6 +1,9 @@
-_to V2.1_
+_For version 2.1 and beyond ..._
 # ascii_images
 A Python project that converts images into ASCII art.
+
+## More details
+This project add just on function what takes an image file as input and converts it into ASCII art. The ASCII art can be optionally written to a specified output file and returned as a string. The image can be resized based on the provided parameters, and the grayscale level and the ASCII characters for the ASCII art can be selected. The function returns None if an error occurs during the process. The function prints the exception and its traceback if an error occurs. The output file is always closed before the function returns, even if an error occurs. Please note that this function requires the PIL (Pillow) library for opening and manipulating the image.
 
 ## Installation
 To install this project, you need to have Python 3 and the following libraries:
@@ -14,7 +17,7 @@ pip install Pillow
 ```
 
 ## Usage
-To use this project, you need to have some images. Then, you can run the `imgTOascii.py.py` file with the following command:
+To use this project, you need to have some images. Then, you can run the `imgTOascii.py.py` file with the following methods:
 
 Run python if you will run my project in a terminal :
 ```bash
