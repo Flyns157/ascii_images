@@ -1,4 +1,5 @@
+__pycache__/
 images/
 venv/
-out.txt
 ascii_art.png
+out.txt
