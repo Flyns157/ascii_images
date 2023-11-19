@@ -1,12 +1,12 @@
 # =============================================== Imports ===============================================
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 # ================================================ Init =================================================
-VERSION = 2.3
+VERSION = 3.0
 NAME = __file__
 
 # ============================================== Functions ==============================================
-def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file : str = 'out.txt', resize : bool = False, resize_percentage : float = 0.5, xsize : int = 50, ysize : int = 50, gscale : int = 0, nb_space : int = 1, other_ascii_gradient : str = None)-> str :
+def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file : str = 'out.txt', resize : bool = False, resize_percentage : float = 0.5, xsize : int = 50, ysize : int = 50, gscale : int = 0, nb_space : int = 0, other_ascii_gradient : str = None)-> str :
     """
     Converts an image to ASCII art and optionally writes it to a file and returns it as a string.
 
@@ -19,7 +19,7 @@ def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file
         xsize (int, optional): The width to resize the image to if resize is None. Defaults to 50.
         ysize (int, optional): The height to resize the image to if resize is None. Defaults to 50.
         gscale (int, optional): The grayscale level to use for the ASCII art. 0 for 10 levels of gray, 1 for ~70 levels of gray. Defaults to 0.
-        nb_space (int, optional): The number of spaces to add between ASCII characters. Defaults to 1.
+        nb_space (int, optional): The number of spaces to add between ASCII characters. Defaults to 0.
         other_ascii_gradient (str, optional): A custom string of ASCII characters to use for the ASCII art. If None, the default gradients are used. Defaults to None.
 
     Returns:
@@ -53,3 +53,32 @@ def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file
             file.close()
         except Exception :
             pass
+
+def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0)-> bool :
+    """
+    Converts an ASCII Art string into an image and saves it to a file.
+
+    Parameters:
+        ascii_art (str): The ASCII Art string to be converted to an image.
+        outpout_file (str, optional): The file path where the image will be saved. By default, 'ascii_art.png'.
+        text_color (tuple[int,int,int] | str, optional) : Text color in RGB or color name. Default: (100, 255, 100).
+        bg_color (tuple[int,int,int] | str, optional): Background color in RGB or color name. Default: (0, 0, 0).
+        compression (int, optional): Image compression factor. Default is 5.
+        font_file (str, optional): The file path of the font to be used. Default: 'font/MonospaceTypewriter.ttf'.
+        font_size (float, optional): The font size. Defaults to 1.0.
+
+    Returns :
+        bool: True if the image has been created and saved successfully, False otherwise.
+    """
+    try :
+        lines = ascii_art.split('\n')
+        img = Image.new('RGB', (len(lines[0])*compression,len(lines)*compression), color = text_color)
+        drawer = ImageDraw.Draw(img)
+        for y, line in enumerate(lines) :
+            for x, char in enumerate(line) :
+                drawer.text((x*compression, y*compression), char, font=ImageFont.truetype(font_file, int(font_size*compression)), fill=text_color)
+        img.save(outpout_file)
+    except Exception as e :
+        e.with_traceback()
+        print(f'caught {type(e)}: {e}')
+        return None
