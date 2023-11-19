@@ -2,7 +2,7 @@
 from PIL import Image
 
 # ================================================ Init =================================================
-VERSION = 2.2
+VERSION = 2.3
 NAME = __file__
 
 # ============================================== Functions ==============================================
@@ -40,7 +40,7 @@ def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file
             elif resize :
                 image = image.resize((int(resize_percentage*image.width), int(resize_percentage*image.height)))
             # Create the ascii image
-            ascii_art = ''.join(''.join((ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space for x in range(image.width))) + '\n' for y in range(image.height))
+            ascii_art = (''.join(''.join((ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space for x in range(image.width))) + '\n' for y in range(image.height)))[:-1]
             if outpout_in_file :
                 file.write(ascii_art)
             return ascii_art
