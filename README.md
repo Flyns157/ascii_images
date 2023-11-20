@@ -19,7 +19,7 @@ pip install Pillow
 ```
 
 ## Usage
-To use this project, you need to have some images. Then, you can run the `imgTOascii.py.py` file with the following methods:
+To use this project, you need to have some images. Then, you can use the `imgTOascii.py` file with the following methods:
 
 Run python if you will run my project in a terminal :
 ```bash
@@ -55,14 +55,15 @@ This will create ASCII art versions of the images in the `output` (`out.txt` by 
 ## Example
 Here is an example of an input image and its ASCII art output:
 
-Commands :
+Code :
 ```python
 import imgTOascii
 imgTOascii.ascii_to_image(imgTOascii.image_to_ascii("logo.ico", resize = True, resize_percentage = 0.5, nb_space = 0, gscale = 0),'Capture.png',bg_color='black',text_color='white')
 ```
 
-![Input image](/logo.ico)
-![Output image](/Capture.png)
+| Input | Output |
+|:-:|:-:|
+| ![Input image](/logo.ico) | ![Output image](/Capture.png) |
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
