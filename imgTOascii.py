@@ -2,7 +2,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
 # ================================================ Init =================================================
-VERSION = 3.0
+VERSION = 3.1
 NAME = __file__
 
 # ============================================== Functions ==============================================
@@ -72,13 +72,14 @@ def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_c
     """
     try :
         lines = ascii_art.split('\n')
-        img = Image.new('RGB', (len(lines[0])*compression,len(lines)*compression), color = text_color)
+        img = Image.new('RGB', (len(lines[0])*compression,len(lines)*compression), color = bg_color)
         drawer = ImageDraw.Draw(img)
         for y, line in enumerate(lines) :
             for x, char in enumerate(line) :
                 drawer.text((x*compression, y*compression), char, font=ImageFont.truetype(font_file, int(font_size*compression)), fill=text_color)
         img.save(outpout_file)
+        return True
     except Exception as e :
         e.with_traceback()
         print(f'caught {type(e)}: {e}')
-        return None
+        return False
