@@ -2,7 +2,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
 # ================================================ Init =================================================
-VERSION = 3.2
+VERSION = 3.25
 NAME = __file__
 
 # ============================================== Functions ==============================================
@@ -42,7 +42,7 @@ def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file
         print(f'caught {type(e)}: {e}')
         return None
 
-def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0)-> bool :
+def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0)-> Image :
     """
     Converts an ASCII Art string into an image and saves it to a file.
 
@@ -66,8 +66,8 @@ def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_c
             for x, char in enumerate(line) :
                 drawer.text((x*compression, y*compression), char, font=ImageFont.truetype(font_file, int(font_size*compression)), fill=text_color)
         img.save(outpout_file)
-        return True
+        return img
     except Exception as e :
         e.with_traceback()
         print(f'caught {type(e)}: {e}')
-        return False
+        return None
