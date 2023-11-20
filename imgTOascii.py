@@ -2,7 +2,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
 # ================================================ Init =================================================
-VERSION = 3.25
+VERSION = 3.27
 NAME = __file__
 
 # ============================================== Functions ==============================================
@@ -56,7 +56,7 @@ def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_c
         font_size (float, optional): The font size. Defaults to 1.0.
 
     Returns :
-        bool: True if the image has been created and saved successfully, False otherwise.
+        Image: the image if it has been created and saved successfully, None otherwise.
     """
     try :
         lines = ascii_art.split('\n')
