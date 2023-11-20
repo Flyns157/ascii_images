@@ -2,7 +2,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
 # ================================================ Init =================================================
-VERSION = 3.1
+VERSION = 3.2
 NAME = __file__
 
 # ============================================== Functions ==============================================
@@ -26,13 +26,6 @@ def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file
         str: The ASCII art as a string, or None if an error occurred.
     """
     try :
-        if outpout_in_file :
-            # Clear output file
-            tmp = open(outpout_file,'w')
-            tmp.write('')
-            tmp.close()
-            # Create the output
-            file = open(outpout_file,'a')
         ascii_char = [' .:-=+*#%@',''' ."`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'''][gscale] if other_ascii_gradient == None else other_ascii_gradient #10 levels of gray then ~70 levels of gray or a personalized one
         with Image.open(input_file) as image:
             if resize == None :
@@ -41,18 +34,13 @@ def image_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file
                 image = image.resize((int(resize_percentage*image.width), int(resize_percentage*image.height)))
             # Create the ascii image
             ascii_art = (''.join(''.join((ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space for x in range(image.width))) + '\n' for y in range(image.height)))[:-1]
-            if outpout_in_file :
-                file.write(ascii_art)
-            return ascii_art
+        if outpout_in_file :
+            with open(outpout_file,'w') as image : image.write(ascii_art)
+        return ascii_art
     except Exception as e:
         e.with_traceback()
         print(f'caught {type(e)}: {e}')
         return None
-    finally :
-        try :
-            file.close()
-        except Exception :
-            pass
 
 def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0)-> bool :
     """
@@ -72,7 +60,7 @@ def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_c
     """
     try :
         lines = ascii_art.split('\n')
-        img = Image.new('RGB', (len(lines[0])*compression,len(lines)*compression), color = bg_color)
+        img = Image.new('RGB', (max([len(line) for line in lines])*compression,len(lines)*compression), color = bg_color)
         drawer = ImageDraw.Draw(img)
         for y, line in enumerate(lines) :
             for x, char in enumerate(line) :
