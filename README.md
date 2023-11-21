@@ -1,21 +1,24 @@
-_For version 3.27 and beyond ..._
+_For version 4.0 and beyond ..._
 # ascii_images
 A Python project that converts images into ASCII art.
 
 ## More details
-This project add just two functions :
+This project add just four functions :
 - The ``image_to_ascii`` function takes an image file as input and converts it into ASCII art. The ASCII art can be optionally written to a specified output file and returned as a string. The image can be resized based on the provided parameters, and the grayscale level and the ASCII characters for the ASCII art can be selected. The function returns None if an error occurs during the process. The function prints the exception and its traceback if an error occurs. Please note that this function requires the PIL (Pillow) library for opening and manipulating the image.
 - The ``ascii_to_image`` function is designed to convert an ASCII Art string into an image and save it to a file. The function works by creating a new image with the specified background color and dimensions based on the ASCII art string. It then draws each character of the ASCII art onto the image using the specified text color and font. If the image is successfully created and saved, it is returned by the function; otherwise, if an exception occurs, the function prints the exception and returns None.
+- ``video_to_ascii``: This function converts a video into ASCII art. It takes as input the path of a video and several other optional parameters to control the conversion process. The function returns a list of ASCII strings representing each frame of the video, the video's frame rate and the video's audio. If an error occurs during conversion, the function prints the error and returns None.
+- ``ascii_to_video``: This function does the opposite of ``video_to_ascii``, converting ASCII art to video. It takes as input a list of ASCII strings, the number of frames per second for the video and several other optional parameters to control the conversion process. The function returns an ``ImageSequenceClip`` object representing the video created. If an error occurs during conversion, the function prints the error and returns None.
 
 ## Installation
 To install this project, you need to have Python 3 and the following libraries:
 
 - Pillow
+- moviePY
 
 You can install them using pip:
 
 ```bash
-pip install Pillow
+pip install Pillow moviepy
 ```
 
 ## Usage
