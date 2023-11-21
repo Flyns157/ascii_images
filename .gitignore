@@ -1,6 +1,6 @@
 __pycache__/
 images/
-venv/
+.venv/
 test-zone.ipynb
 ascii_art.png
 out.txt
