@@ -61,12 +61,12 @@ Here is an example of an input image and its ASCII art output:
 Code :
 ```python
 import imgTOascii
-imgTOascii.ascii_to_image(imgTOascii.image_to_ascii("logo.ico", resize = True, resize_percentage = 0.5, nb_space = 0, gscale = 0),'Capture.png',bg_color='black',text_color='white')
+imgTOascii.ascii_to_image(imgTOascii.image_to_ascii("logo.ico", resize = True, resize_percentage = 0.5, nb_space = 0, gscale = 0),'Capture.png',bg_color='black',text_color='white', compression=20)
 ```
 
 | Input | Output |
 |:-:|:-:|
-| ![Input image](/logo.ico) | ![Output image](/Capture.png) |
+| <img src="logo.ico" width="5000"> | <img src="Capture.png" width="5000"> |
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
