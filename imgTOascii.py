@@ -1,11 +1,53 @@
+"""
+>>> help(message)
+
+Help on module message:
+
+NAME
+    message - Module inutile qui affiche des messages :-).
+
+FUNCTIONS
+    bonjour(nom)
+        Dit Bonjour.
+
+    ciao(nom)
+        Dit Ciao.
+
+    hello(nom)
+        Dit Hello.
+
+DATA
+    DATE = 16092008
+
+FILE
+    /home/pierre/message.py
+"""
+
+"""
+This file is meant to make it easy to load the main features of
+MoviePy by simply typing:
+
+>>> from moviepy.editor import *
+
+In particular it will load many effects from the video.fx and audio.fx
+folders and turn them into VideoClip methods, so that instead of
+>>> clip.fx( vfx.resize, 2 ) # or equivalently vfx.resize(clip, 2)
+we can write
+>>> clip.resize(2)
+
+It also starts a PyGame session (if PyGame is installed) and enables
+clip.preview().
+"""
+
 # =============================================== Imports ===============================================
+import os
 import numpy
 from PIL import Image, ImageDraw, ImageFont
+from concurrent.futures import ThreadPoolExecutor
 from moviepy.editor import VideoFileClip, AudioFileClip, ImageSequenceClip
 
 # ================================================ Init =================================================
-VERSION = 4.0
-NAME = __file__
+__version__ = "4.2"
 
 # ============================================== Functions ==============================================
 
@@ -52,6 +94,11 @@ def image_to_ascii(input : str | Image.Image, outpout_in_file : bool = True, out
         print(f'caught {type(e)}: {e}')
         return None
 
+def process_images(image_files):
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        futures = [executor.submit(image_to_ascii, image_file) for image_file in image_files]
+        return [future.result()for future in futures]
+
 def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0)-> Image.Image :
     """
     Converts an ASCII Art string into an image and saves it to a file.
@@ -82,16 +129,21 @@ def ascii_to_image(ascii_art : str, outpout_file : str = 'ascii_art.png', text_c
         print(f'caught {type(e)}: {e}')
         return None
 
+def process_ascii_art(ascii_arts, output_files):
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        futures = [executor.submit(ascii_to_image, ascii_art, output_file) for ascii_art, output_file in zip(ascii_arts, output_files)]
+        return [future.result()for future in futures]
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: VIDEO ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-def video_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file : str = 'out.txt', resize : bool = False, resize_percentage : float = 0.5, xsize : int = 50, ysize : int = 50, gscale : int = 0, nb_space : int = 0, other_ascii_gradient : str = None)-> tuple[list[str], int, AudioFileClip] :
+def video_to_ascii(input_file : str, outpout_in_file : bool = False, outpout_file : str = 'out.txt', resize : bool = False, resize_percentage : float = 0.5, xsize : int = 50, ysize : int = 50, gscale : int = 0, nb_space : int = 0, other_ascii_gradient : str = None)-> tuple[list[str], int, AudioFileClip] :
     """
     Converts video to ASCII art.
 
     Args:
         input_file (str): Path to video file to be converted.
-        outpout_in_file (bool, optional): If True, saves ASCII art to file. Defaults to True.
+        outpout_in_file (bool, optional): If True, saves ASCII art to file. Defaults to False.
         outpout_file (str, optional): Path to output file. Defaults to 'out.txt'.
         resize (bool, optional): If True, resizes image before conversion. Defaults to False.
         resize_percentage (float, optional): Resize percentage. Defaults to 0.5.
@@ -115,7 +167,7 @@ def video_to_ascii(input_file : str, outpout_in_file : bool = True, outpout_file
         print(f'caught {type(e)}: {e}')
         return None
 
-def ascii_to_video(ascii_art : list[str], fps : int, outpout_in_file : bool = False, outpout_file : str = 'ascii_art.mp4', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0, audio : AudioFileClip = None)-> Image :
+def ascii_to_video(ascii_art : list[str], fps : int, outpout_in_file : bool = False, outpout_file : str = 'ascii_art.mp4', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0, audio : AudioFileClip = None)-> ImageSequenceClip :
     """
     Converts ASCII art to video.
 
@@ -132,7 +184,7 @@ def ascii_to_video(ascii_art : list[str], fps : int, outpout_in_file : bool = Fa
         audio (AudioFileClip, optional): Audio to add to video. Defaults to None.
 
     Returns:
-        Image: An Image object representing the created video.
+        ImageSequenceClip: An ImageSequenceClip object representing the created video.
     """
     try :
         max_width = max([len(line) for frame in ascii_art for line in frame.split('\n')])
