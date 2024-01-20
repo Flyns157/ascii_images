@@ -81,7 +81,13 @@ def image_to_ascii(input : str | Image.Image, outpout_in_file : bool = True, out
             elif resize :
                 image = image.resize((int(resize_percentage*image.width), int(resize_percentage*image.height)))
             # Create the ascii image
-            return (''.join(''.join((ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space for x in range(image.width))) + '\n' for y in range(image.height)))[:-1]
+            def line_process(image : Image.Image, y : int)-> str :
+                return ''.join(
+                    (ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space
+                    for x in range(image.width)))
+            with ThreadPoolExecutor() as executor:
+                futures = [executor.submit(line_process(image,y))for y in range(image.height)]
+                return '\n'.join(futur.result() for futur in futures)
         if type(input) == str :
             with Image.open(input) as image : ascii_art = to_ascii(image)
         else :
