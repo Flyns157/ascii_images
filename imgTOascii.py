@@ -81,13 +81,7 @@ def image_to_ascii(input : str | Image.Image, outpout_in_file : bool = True, out
             elif resize :
                 image = image.resize((int(resize_percentage*image.width), int(resize_percentage*image.height)))
             # Create the ascii image
-            def line_process(image : Image.Image, y : int)-> str :
-                return ''.join(
-                    (ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space
-                    for x in range(image.width)))
-            with ThreadPoolExecutor() as executor:
-                futures = [executor.submit(line_process(image,y))for y in range(image.height)]
-                return '\n'.join(futur.result() for futur in futures)
+            return (''.join(''.join((ascii_char[(sum(image.getpixel((x, y))) // len(image.getpixel((x, y)))) * (len(ascii_char) - 1) // 255] + ' '*nb_space for x in range(image.width))) + '\n' for y in range(image.height)))[:-1]
         if type(input) == str :
             with Image.open(input) as image : ascii_art = to_ascii(image)
         else :
@@ -143,35 +137,49 @@ def process_ascii_art(ascii_arts, output_files):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: VIDEO ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-def video_to_ascii(input_file : str, outpout_in_file : bool = False, outpout_file : str = 'out.txt', resize : bool = False, resize_percentage : float = 0.5, xsize : int = 50, ysize : int = 50, gscale : int = 0, nb_space : int = 0, other_ascii_gradient : str = None)-> tuple[list[str], int, AudioFileClip] :
-    """
-    Converts video to ASCII art.
+import cv2
 
-    Args:
-        input_file (str): Path to video file to be converted.
-        outpout_in_file (bool, optional): If True, saves ASCII art to file. Defaults to False.
-        outpout_file (str, optional): Path to output file. Defaults to 'out.txt'.
-        resize (bool, optional): If True, resizes image before conversion. Defaults to False.
-        resize_percentage (float, optional): Resize percentage. Defaults to 0.5.
-        xsize (int, optional): Width of resized image. Defaults to 50.
-        ysize (int, optional): Height of resized image. Defaults to 50.
-        gscale (int, optional): Gray scale for conversion to ASCII. Defaults to 0.
-        nb_space (int, optional): Number of spaces to add between ASCII characters. Defaults to 0.
-        other_ascii_gradient (str, optional): Other ASCII gradient to be used for conversion. Defaults to None.
+def video_to_ascii(input_video: str, output_file: str = 'out.txt', fps: int = 24, **kwargs):
+    """
+    Converts a video to ASCII art and writes it to a file.
+
+    Parameters:
+        input_video (str): The path to the input video file.
+        output_file (str, optional): The path to the output text file. Defaults to 'out.txt'.
+        fps (int, optional): The frames per second to use for the output video. Defaults to 24.
+        **kwargs: Additional arguments to pass to the image_to_ascii function.
 
     Returns:
-        tuple: A tuple containing a list of ASCII strings, the video's frame rate and the video's audio.
+        None
     """
-    try :
-        with VideoFileClip(input_file) as video:
-            tmp = ([image_to_ascii(Image.fromarray(frame), outpout_in_file = False, outpout_file = outpout_file, resize = resize, resize_percentage = resize_percentage, xsize = xsize, ysize = ysize, gscale = gscale, nb_space = nb_space, other_ascii_gradient = other_ascii_gradient) for frame in video.iter_frames()],video.fps,video.audio)
-        if outpout_in_file :
-            with open(outpout_file,'w') as image : image.write(tmp[0])
-        return tmp
-    except Exception as e:
-        e.with_traceback()
-        print(f'caught {type(e)}: {e}')
-        return None
+    # Open the video file
+    video = cv2.VideoCapture(input_video)
+
+    # Check if video opened successfully
+    if not video.isOpened():
+        print(f"Error opening video file {input_video}")
+        return
+
+    frames = []
+    while video.isOpened():
+        # Capture frame-by-frame
+        ret, frame = video.read()
+        if ret:
+            # Convert the image frame to ASCII
+            frames.append(frame)
+        else:
+            break
+
+    # When everything done, release the video capture object
+    video.release()
+
+    # Process all frames with process_images function
+    ascii_arts = process_images(frames)
+
+    # Write the ASCII art to the output file
+    with open(output_file, 'w') as f:
+        f.write('\n'.join(ascii_arts))
+
 
 def ascii_to_video(ascii_art : list[str], fps : int, outpout_in_file : bool = False, outpout_file : str = 'ascii_art.mp4', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0, audio : AudioFileClip = None)-> ImageSequenceClip :
     """

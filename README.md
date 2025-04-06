@@ -68,5 +68,10 @@ imgTOascii.ascii_to_image(imgTOascii.image_to_ascii("logo.ico", resize = True, r
 |:-:|:-:|
 | <img src="logo.ico" width="5000"> | <img src="Capture.png" width="5000"> |
 
+## C++ Experimental Version
+You can compile the module with the following command :
+```shell
+python setup.py build_ext --inplace
+```
 ## License
 This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
