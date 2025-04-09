@@ -6,7 +6,7 @@ from .Image import (
     ascii_to_greyimg
 )
 
-__version__ = "4.2"
+__version__ = "4.3"
 __All__ = [
     "img_to_ascii",
     "process_images",
