@@ -14,7 +14,7 @@ import numpy as np
 
 from .Utils import (
     AsciiGradient,
-    GreyscaleMode,
+    Mode,
     PositiveInt,
     PositiveNotZeroInt,
     Percent,
@@ -32,7 +32,7 @@ def image_to_ascii(
         ascii_gradient: AsciiGradient = AsciiGradient.LEVEL_10,
         output_dimensions: Dimension | Percent = Dimension(50, 50),
         output_file: Path = None,
-        greyscale_mode: GreyscaleMode = GreyscaleMode.GREYSCALE, 
+        greyscale_mode: Mode = Mode.GREYSCALE, 
         space: PositiveInt = 0
     ) -> str:
     """
@@ -68,12 +68,14 @@ def image_to_ascii(
 
     # Compute
     match greyscale_mode:
-        case GreyscaleMode.GREYSCALE:
+        case Mode.GREYSCALE:
             grayscale = arr.mean(axis=2)
-        case GreyscaleMode.LUMINANCE:
+        case Mode.LUMINANCE:
             grayscale = arr.max(axis=2)
-        case GreyscaleMode.MIN:
+        case Mode.MIN:
             grayscale = arr.min(axis=2)
+        case _:
+            raise ValueError(f'Invalid greyscale mode: {greyscale_mode}.')
     
     # Normalize to ASCII gradient indices
     n = (len(ascii_gradient.value) - 1) / 255
@@ -163,9 +165,25 @@ def process_images(images_files):
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         futures = [executor.submit(img_to_ascii, image_file) for image_file in images_files]
         return [future.result()for future in futures]
+    
 
+def ascii_to_image()-> Image | None :
+    """
+    Converts an ASCII Art string into an image and saves it to a file.
+    """
+    ...
+
+
+@deprecated('Use ascii_to_image instead.')
 def ascii_to_img(
-        ascii_art : str, outpout_file : str = 'ascii_art.png', text_color : tuple[int,int,int] | str = (100, 255, 100), bg_color : tuple[int,int,int] | str = (0, 0, 0), compression : int = 5, font_file : str = 'font/MonospaceTypewriter.ttf', font_size : float = 1.0)-> Image | None :
+        ascii_art : str,
+        outpout_file : str = 'ascii_art.png',
+        text_color : tuple[int,int,int] | str = (100, 255, 100),
+        bg_color : tuple[int,int,int] | str = (0, 0, 0),
+        compression : int = 5,
+        font_file : str = 'font/MonospaceTypewriter.ttf',
+        font_size : float = 1.0
+    )-> Image | None :
     """
     Converts an ASCII Art string into an image and saves it to a file.
     """

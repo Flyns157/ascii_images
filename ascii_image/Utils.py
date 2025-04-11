@@ -36,10 +36,11 @@ class AsciiGradient(Enum):
             raise ValueError(f'Invalid gscale value: {gscale}. Expected 0 or 1.') from e
 
 
-class GreyscaleMode(Enum):
+class Mode(Enum):
     MIN = "min"
     LUMINANCE = "luminance"
     GREYSCALE = "greyscale"
+    TEXT_IMAGE = "text_image"
 
 
 class PositiveInt(int):
