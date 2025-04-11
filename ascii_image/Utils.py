@@ -37,11 +37,14 @@ class AsciiGradient(Enum):
             raise ValueError(f'Invalid gscale value: {gscale}. Expected 0 or 1.') from e
 
 
-class Mode(Enum):
+class ProcessType(Enum):
     MIN = "min"
     MAX = "max"
     AVG = "avg"
-    TEXT_IMAGE = "text_image"
+
+
+# class Mode(Enum):
+#     TEXT_IMAGE = "text_image"
 
 
 class PositiveInt(int):

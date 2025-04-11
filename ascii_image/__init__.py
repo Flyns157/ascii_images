@@ -1,18 +1,16 @@
 from .Image import (
     image_to_ascii,
-    img_to_ascii,
+    ascii_to_image,
     process_images,
-    ascii_to_img,
     process_ascii_art, 
     ascii_to_greyimg
 )
 
-__version__ = "4.3"
+__version__ = "5.2"
 __All__ = [
     "image_to_ascii",
-    "img_to_ascii",
+    "ascii_to_image",
     "process_images",
-    "ascii_to_img",
     "process_ascii_art",
     "ascii_to_greyimg"
 ]
