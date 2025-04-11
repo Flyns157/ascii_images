@@ -5,6 +5,7 @@ This module provides utility functions and objects for the Image module.
 
 # =============================================== Imports ===============================================
 from enum import Enum
+from PIL.ImageColor import getrgb
 
 
 # =============================================== Objects ===============================================
@@ -82,26 +83,36 @@ class ColorLevel(int):
 
 
 class Color(tuple):
-    def __new__(cls, r: ColorLevel, g: ColorLevel, b: ColorLevel):
-        r = ColorLevel(r)
-        g = ColorLevel(g)
-        b = ColorLevel(b)
-        return super().__new__(cls, (r, g, b))
+    def __new__(cls, *args):
+        if len(args) == 1:
+            if isinstance(args[0], str):
+                # Cas : nom ou hexadécimal
+                rgb = getrgb(args[0])  # lève une ValueError si invalide
+            if isinstance(args[0], tuple):
+                if len(args[0]) != 3:
+                    raise ValueError("Color tuple must have 3 elements (r, g, b).")
+                # Cas : tuple (r, g, b)
+                rgb = tuple(map(ColorLevel,args[0]))
+        elif len(args) == 3:
+            # Cas : trois entiers RGB
+            rgb = tuple(map(ColorLevel,args))
+        else:
+            raise ValueError("Color must be initialized with either 1 (str) or 3 (r, g, b) arguments.")
+        
+        return super().__new__(cls, rgb)
 
     @property
-    def r(self):
-        return self[0]
-
+    def r(self): return self[0]
     @property
-    def g(self):
-        return self[1]
-
+    def g(self): return self[1]
     @property
-    def b(self):
-        return self[2]
+    def b(self): return self[2]
+
+    def to_hex(self):
+        return f"#{self[0]:02x}{self[1]:02x}{self[2]:02x}"
 
     def __repr__(self):
-        return f"Color({self.r}, {self.g}, {self.b})"
+        return f"Color({self[0]}, {self[1]}, {self[2]})"
 
 
 class Dimension(tuple):
@@ -117,6 +128,13 @@ class Dimension(tuple):
     @property
     def height(self):
         return self[1]
+    
+    def to_tuple(self):
+        return (self.width, self.height)
 
     def __repr__(self):
         return f"Dimension(width={self.width}, height={self.height})"
+
+
+# ============================================== Functions ==============================================
+...
