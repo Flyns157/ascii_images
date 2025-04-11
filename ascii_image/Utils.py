@@ -5,6 +5,7 @@ This module provides utility functions and objects for the Image module.
 
 # =============================================== Imports ===============================================
 from enum import Enum
+import numpy as np
 from PIL.ImageColor import getrgb
 
 
@@ -38,8 +39,8 @@ class AsciiGradient(Enum):
 
 class Mode(Enum):
     MIN = "min"
-    LUMINANCE = "luminance"
-    GREYSCALE = "greyscale"
+    MAX = "max"
+    AVG = "avg"
     TEXT_IMAGE = "text_image"
 
 
@@ -78,7 +79,7 @@ class ColorLevel(int):
     An integer type that is between 0 and 255.
     """
     def __new__(cls, value):
-        if 0 <= value <= 255:
+        if 0 > value > 255:
             raise ValueError(f'Expected an integer between 0 and 255, got {value}.')
         return int.__new__(cls, value)
 
@@ -135,6 +136,9 @@ class Dimension(tuple):
 
     def __repr__(self):
         return f"Dimension(width={self.width}, height={self.height})"
+
+
+type GrayScale = np.ndarray[np.dtype[ColorLevel]]
 
 
 # ============================================== Functions ==============================================
