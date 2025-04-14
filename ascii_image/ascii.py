@@ -93,43 +93,46 @@ class AsciiArt(str):
     """
     def __new__(cls, value):
         if not isinstance(value, str):
-            raise TypeError(f'Expected a string, got {type(value)}.')
+            raise TypeError(f'Expected a string or AsciiArt object, got {type(value)}.')
         return str.__new__(cls, value)
 
+
     @property
-    def width(self):
+    def width(self)-> int:
         """
         Get the width of the ASCII art.
         """
         return max(len(line) for line in self.split('\n'))
 
     @property
-    def height(self):
+    def height(self) -> PositiveInt:
         """
         Get the height of the ASCII art.
         """
         return len(self.split('\n'))
     
     @property
-    def size(self):
+    def size(self)-> Dimension:
         """
         Get the size of the ASCII art as a Dimension object.
         """
         return Dimension(self.width, self.height)
     
+    _gradient: AsciiGradient | None = None
+
     @property
-    def gradient(self) -> AsciiGradient:
-        """
+    def gradient(self) -> AsciiGradient | None:
+        """ 
         Get the ASCII art gradient.
         """
-        return self.gradient
+        return self._gradient
     
     @gradient.setter
     def gradient(self, gradient: AsciiGradient):
         """
         Set the ASCII art gradient.
         """
-        self.gradient = AsciiGradient(gradient)
+        self._gradient = AsciiGradient(gradient)
     
     
     def guess_ascii_gradient(self) -> AsciiGradient:
@@ -158,6 +161,7 @@ class AsciiArt(str):
         Returns:
             GrayScale: The greyscale numpy array.
         """
+        gradient = gradient or self.gradient
         n = 255 / (len(gradient) - 1)
         indexed_gradient = {c:i for i,c in enumerate(gradient)}
 
@@ -188,11 +192,12 @@ class AsciiArt(str):
         Returns:
             AsciiArt: The ASCII art string.
         """
+        # TODO: add GreyScale validation
         gradient = AsciiGradient(gradient)
 
         # Normalize to ASCII gradient indices
         n = (len(gradient) - 1) / 255
-        scaled = (grayscale * n).astype(ColorLevel)
+        scaled = (grayscale * n).astype(int)
 
         # Map values to ASCII characters
         chars = np.array(list(gradient))[scaled]
@@ -200,25 +205,29 @@ class AsciiArt(str):
         if space > 0: chars = np.char.add(chars, ' ' * space)
 
         # Join rows
-        return cls('\n'.join(''.join(row) for row in chars))
+        ascii_art = cls('\n'.join(''.join(row) for row in chars))
+        ascii_art.gradient = gradient
+        return ascii_art
 
 
     @classmethod
     def from_image(
         cls,
         img: Path | Image,
-        gradient: AsciiGradient = None,
+        gradient: AsciiGradient,
         space : PositiveInt = 0,
-        grayscale_mode : ProcessType = ProcessType.AVG
+        grayscale_mode : ProcessType = ProcessType.AVG,
+        final_dimensions : float | Dimension = 1.0
     ) -> 'AsciiArt':    
         """
         Convert an image to an ASCII art string.
 
         Parameters:
-            img (Path | Image):            The path to the image file or the image object to convert.
-            gradient (AsciiGradient, optional): The ASCII gradient to use. Defaults to None.
-            space (PositiveInt, optional):  The number of spaces to add between ASCII characters. Defaults to 0.
-            grayscale_mode (ProcessType, optional): The method to use to convert the image to grayscale. Defaults to ProcessType.AVG.
+            img (Path | Image):                             The path to the image file or the image object to convert.
+            gradient (AsciiGradient):                       The ASCII gradient to use.
+            space (PositiveInt, optional):                  The number of spaces to add between ASCII characters. Defaults to 0.
+            grayscale_mode (ProcessType, optional):         The method to use to convert the image to grayscale. Defaults to ProcessType.AVG.
+            final_dimensions (float | Dimension, optional): The output dimensions as a float (relative to the input image dimensions) or as a Dimension object. Defaults to 1.0.
             
         Returns:
             AsciiArt: The ASCII art string.
@@ -226,21 +235,22 @@ class AsciiArt(str):
         # Check input types and values
         img_must_be_closed = False
         if isinstance(img, (str, Path)): img, img_must_be_closed = open_image(Path(img)), True
-        if not isinstance(gradient, AsciiGradient): raise TypeError(f'Expected an AsciiGradient, got {type(ascii_gradient)}.')
-        output_dimensions = (int(img.width * output_dimensions), int(img.height * output_dimensions)) if isinstance(output_dimensions, float) else Dimension(*output_dimensions)
+        gradient = AsciiGradient(gradient)
+        final_dimensions = (int(img.width * final_dimensions), int(img.height * final_dimensions)) if isinstance(final_dimensions, float) else Dimension(*final_dimensions)
         space = PositiveInt(space)
 
         # Convert to ASCII art
         ascii_art = cls.from_grayscale(
             # Compute grayscale
             grayscale=image_to_grayscale(
-                img.resize(output_dimensions),
+                img.resize(final_dimensions),
                 grayscale_mode
             ),
-            ascii_gradient=gradient,
+            gradient=gradient,
             space=space
         )
         if img_must_be_closed: img.close()
+        ascii_art.gradient = gradient
         return ascii_art
     
 
