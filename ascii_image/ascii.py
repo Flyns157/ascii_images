@@ -254,11 +254,17 @@ class AsciiArt(str):
         return ascii_art
     
 
-    def to_graylevel_img(self) -> Image:
+    def to_graylevel_img(self, gradient: AsciiGradient=None) -> Image:
         """
         Convert the ASCII art to a grayscale image.
+
+        Parameters:
+            gradient (AsciiGradient, optional): The ASCII gradient to use. Defaults to AsciiGradient.LEVEL_10.
+
+        Returns:
+            Image: The grayscale image object.
         """
-        return fromarray(self.to_grayscale().astype(np.uint8), mode='L')
+        return fromarray(self.to_grayscale(gradient or self.gradient).astype(np.uint8), mode='L')
     
 
     def to_image_of_ascii(
@@ -302,6 +308,34 @@ class AsciiArt(str):
                     fill=text_color
                 )
         return img
+    
+
+    def adapt_to_new_gradient(self, new_gradient: AsciiGradient) -> 'AsciiArt':
+        """
+        Adapt the ASCII art to a new gradient.
+
+        Parameters:
+            new_gradient (AsciiGradient): The new ASCII gradient to use.
+
+        Returns:
+            AsciiArt: The adapted ASCII art string.
+        """
+        # TODO: implement
+        raise NotImplementedError()
+    
+
+    def resize(self, new_dimensions: Dimension) -> 'AsciiArt':
+        """
+        Resize the ASCII art to a new dimensions.
+
+        Parameters:
+            new_dimensions (Dimension): The new dimensions as a Dimension object.
+
+        Returns:
+            AsciiArt: The resized ASCII art string.
+        """
+        # TODO: implement
+        raise NotImplementedError()
 
         
 def guess_ascii_gradient_by_most_common(ascii_art: str) -> str:
