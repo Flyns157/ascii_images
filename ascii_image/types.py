@@ -60,3 +60,28 @@ class Dimension(tuple):
 
 
 type GrayScale = np.ndarray[np.dtype[ColorLevel]]
+
+
+def is_valid_grayscale(image: GrayScale) -> bool:
+    """
+    Validate if the input is a valid GrayScale image.
+
+    Parameters:
+        image (np.ndarray): The image to validate.
+
+    Returns:
+        bool: True if the image is a valid GrayScale image, False otherwise.
+    """
+    if not isinstance(image, np.ndarray):
+        return False
+    
+    if image.dtype not in (ColorLevel, np.uint8, int):
+        return False
+    
+    if image.ndim != 2:
+        return False
+    
+    if not (0 <= image.min() <= image.max() <= 255):
+        return False
+    
+    return True

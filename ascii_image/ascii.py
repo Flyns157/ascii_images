@@ -9,7 +9,7 @@ from pathlib import Path
 from PIL import ImageDraw, ImageFont
 from PIL.Image import Image, open as open_image, new as new_image, fromarray
 
-from .types import Dimension, GrayScale, PositiveInt, ProcessType
+from .types import Dimension, GrayScale, PositiveInt, Percent, ProcessType, is_valid_grayscale
 from .color import Color, ColorLevel, BLACK
 from .image import image_to_grayscale
 
@@ -192,7 +192,7 @@ class AsciiArt(str):
         Returns:
             AsciiArt: The ASCII art string.
         """
-        # TODO: add GreyScale validation
+        if not is_valid_grayscale(grayscale): raise ValueError('Invalid grayscale input.')
         gradient = AsciiGradient(gradient)
 
         # Normalize to ASCII gradient indices
@@ -264,7 +264,7 @@ class AsciiArt(str):
         Returns:
             Image: The grayscale image object.
         """
-        return fromarray(self.to_grayscale(gradient or self.gradient).astype(np.uint8), mode='L')
+        return fromarray(self.to_grayscale(AsciiGradient(gradient or self.gradient)).astype(np.uint8), mode='L')
     
 
     def to_image_of_ascii(
@@ -320,22 +320,41 @@ class AsciiArt(str):
         Returns:
             AsciiArt: The adapted ASCII art string.
         """
-        # TODO: implement
-        raise NotImplementedError()
+        if not self.gradient: raise ValueError('Cannot adapt an ASCII art without an initial gradient.')
+        new_gradient = AsciiGradient(new_gradient)
+
+        new_ascii_art = self.from_grayscale(
+            self.to_grayscale(self.gradient),
+            new_gradient
+        )
+        new_ascii_art.gradient = new_gradient
+        return new_ascii_art
     
 
-    def resize(self, new_dimensions: Dimension) -> 'AsciiArt':
+    def resize(self, new_dimensions: Dimension | Percent, gradient: AsciiGradient=None) -> 'AsciiArt':
         """
         Resize the ASCII art to a new dimensions.
 
         Parameters:
-            new_dimensions (Dimension): The new dimensions as a Dimension object.
+            new_dimensions (Dimension):         The new dimensions as a Dimension object.
+            gradient (AsciiGradient, optional): The ASCII gradient to use. Defaults to the current gradient.
 
         Returns:
             AsciiArt: The resized ASCII art string.
         """
-        # TODO: implement
-        raise NotImplementedError()
+        if not (gradient:=AsciiGradient(gradient or self.gradient)): raise ValueError('Cannot resize an ASCII art without an initial gradient.')
+        new_dimensions = (int(self.width * new_dimensions), int(self.height * new_dimensions)) if isinstance(new_dimensions, float) else Dimension(*new_dimensions)
+
+        # Convert the numpy array to an image
+        pil_image = fromarray(
+            self.to_grayscale(gradient).astype(np.uint8),
+            mode='L'
+        )
+        
+        # Resize the image
+        resized_pil_image = pil_image.resize(new_dimensions)
+        
+        return self.from_image(resized_pil_image, gradient)
 
         
 def guess_ascii_gradient_by_most_common(ascii_art: str) -> str:
